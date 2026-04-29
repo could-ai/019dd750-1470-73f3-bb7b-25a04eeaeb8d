@@ -7,73 +7,93 @@ class PptPreviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<PptProvider>();
-    final draft = provider.currentDraft;
+    final pptProvider = context.watch<PptProvider>();
+    final draft = pptProvider.currentDraft;
 
-    if (draft == null) return const Scaffold();
+    if (draft == null) return const Scaffold(body: Center(child: Text('No active draft')));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Preview Presentation'),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[400]!),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.slideshow, size: 100, color: Colors.deepPurple),
-                    const SizedBox(height: 16),
-                    Text(
-                      draft['topic']?.isNotEmpty == true ? draft['topic'] : 'Untitled',
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text('Template: ${draft['template']} | Style: ${draft['style']}'),
-                    Text('${draft['slideCount']} Slides Generated'),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () {
-                    provider.saveCurrentProject();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Saved to your presentations!'))
-                    );
-                    Navigator.popUntil(context, ModalRoute.withName('/home'));
-                  },
-                  icon: const Icon(Icons.save),
-                  label: const Text('Save'),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Downloading PPTX... (Mock)'))
-                    );
-                  },
-                  icon: const Icon(Icons.download),
-                  label: const Text('Download'),
-                ),
-              ],
-            ),
+        title: const Text('Preview & Export'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            tooltip: 'Save to My Presentations',
+            onPressed: () {
+              pptProvider.saveCurrentProject();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Saved to My Presentations')),
+              );
+              Navigator.popUntil(context, ModalRoute.withName('/home'));
+            },
           )
         ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: Card(
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Center(
+                        child: Icon(Icons.slideshow, size: 64, color: Colors.deepPurple),
+                      ),
+                      const SizedBox(height: 24),
+                      Text('Topic: ${draft['topic']}', style: Theme.of(context).textTheme.titleLarge),
+                      const SizedBox(height: 16),
+                      Text('Template: ${draft['template']}'),
+                      Text('Transitions: ${draft['transitions']}'),
+                      Text('Style: ${draft['style']}'),
+                      Text('Slides: ${draft['slideCount']}'),
+                      Text('Intro Slide: ${draft['includeIntro'] ? "Yes" : "No"}'),
+                      Text('Thank You Slide: ${draft['includeThankYou'] ? "Yes" : "No"}'),
+                      const Spacer(),
+                      const Center(
+                        child: Text('Preview Mode: Layout is ready!', 
+                          style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Store functionality mocked')),
+                      );
+                    },
+                    icon: const Icon(Icons.cloud_upload),
+                    label: const Text('Store to Cloud'),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Downloading PPTX...')),
+                      );
+                    },
+                    icon: const Icon(Icons.download),
+                    label: const Text('Download .pptx'),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
